@@ -20,7 +20,7 @@ services:
     networks:
       - inklenet
     env_file: .env
-    image: albancrommer/inklewriter:candidate
+    build: .
     user: "1000:1000"
     volumes:
         - .:/usr/src/app

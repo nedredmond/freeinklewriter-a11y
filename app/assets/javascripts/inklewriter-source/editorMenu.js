@@ -571,6 +571,34 @@ var EditorMenu = function() {
 
         jqMenu.append(jqMenuItemLink);
     }
+
+    var addModeSwitch = function(playMode, jqMenu) {
+        // Add a separator first if this isn't the first option
+        var jqChildren = jqMenu.children();
+        if( jqChildren.length > 0 && !jqChildren.last().hasClass("separator") ) {
+            jqMenu.append('<div class="separator"></div>');
+        }
+
+        var jqMenuItemSwitch = $(`
+            <fieldset class="mode-switch">
+                <legend>Mode</legend>
+                <label>
+                    <input type="radio" name="mode" value="write" ${!playMode ? 'checked' : ''}>
+                    write
+                </label>
+                <div class="separator" />
+                <label>
+                    <input type="radio" name="mode" value="read" ${playMode ? 'checked' : ''}>
+                    read
+                </label>
+            </fieldset>
+        `);
+
+        jqMenuItemSwitch.find('input[type="radio"]').bind('change', (e) => 
+            e.target.value === 'write' ? EditorMenu.enterEditMode() : EditorMenu.enterPlayMode());
+
+        jqMenu.append(jqMenuItemSwitch);
+    }
    
     var updateMenuBar = function() {
         
@@ -578,8 +606,6 @@ var EditorMenu = function() {
         
         // Remove all login/out elements
         clearMenu(jqEditorMenu);
-
-
 
         if (!playMode)  {
             if (Editor.settings.graphing)
@@ -591,16 +617,8 @@ var EditorMenu = function() {
                 addMenuOption("<span id='libraryButton'>" + tr("contents") + "</span>", jqEditorMenu, EditorMenu.toggleLibraryView, tr("Open the content list"));
             }
         }
-    
-        
-        if (!playMode) {
-            addMenuOption("<span class='toggledto'>" + tr("write") + "</span>", jqEditorMenu);
-            addMenuOption(tr("read"), jqEditorMenu, EditorMenu.enterPlayMode, tr("Read your story"));
-        }
-        else {
-            addMenuOption(tr("write"), jqEditorMenu, EditorMenu.enterEditMode, tr("Write your story"));
-            addMenuOption("<span class='toggledto'>" + tr("read") + "</span>", jqEditorMenu);
-        }
+
+        addModeSwitch(playMode, jqEditorMenu)
 
         if (!($.browser.msie && parseInt($.browser.version, 10) <= 8)) {
             addMenuOption("<span style='font-size:24px;'>&#9881;</span>", jqEditorMenu, EditorMenu.showSettingsDialogue, tr("Settings"));
